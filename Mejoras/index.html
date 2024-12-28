@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      text-align: center;
+      font-family: "Trebuchet MS", Arial;
+    }
+    .slider-container {
+      margin: 20px;
+    }
+    .slider {
+      width: 300px;
+      margin: 10px 0;
+    }
+    .button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 16px 40px;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    #estado {
+      font-size: 20px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Control de Servos</h1>
+  <p><button class="button" onclick="controlarServo('mano_cerrada', 'Mano cerrada')">Cerrar Mano</button></p>
+  <p><button class="button" onclick="controlarServo('mano_abierta', 'Mano abierta')">Abrir Mano</button></p>
+  <p><button class="button" onclick="controlarServo('dedo_1a1', 'Mover dedos uno a uno')">Mover Dedo 1 a 1</button></p>
+
+  <!-- Texto de estado -->
+  <p id="estado">Estado actual: Mano abierta</p>
+
+  <!-- Deslizadores para los 5 servos -->
+  <div class="slider-container">
+    <p>Pulgar: <span id="posServo1">22.5</span>°</p>
+    <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo1" oninput="moverServo(1, this.value)">
+  </div>
+
+  <div class="slider-container">
+    <p>Indice: <span id="posServo2">22.5</span>°</p>
+    <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo2" oninput="moverServo(2, this.value)">
+  </div>
+
+  <div class="slider-container">
+    <p>Medio: <span id="posServo3">22.5</span>°</p>
+    <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo3" oninput="moverServo(3, this.value)">
+  </div>
+
+  <div class="slider-container">
+    <p>Anular: <span id="posServo4">22.5</span>°</p>
+    <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo4" oninput="moverServo(4, this.value)">
+  </div>
+
+  <div class="slider-container">
+    <p>Menique: <span id="posServo5">22.5</span>°</p>
+    <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo5" oninput="moverServo(5, this.value)">
+  </div>
+
+  <script>
+    let estadoActual = "Mano abierta"; // Estado inicial
+
+    // Función para cargar el estado actual al cargar la página
+    window.onload = function() {
+      fetch('/estado')
+        .then(response => response.text())
+        .then(data => {
+          estadoActual = data;
+          document.getElementById("estado").textContent = `Estado actual: ${estadoActual}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById("estado").textContent = "Error al cargar el estado actual.";
+        });
+    };
+
+    // Función para mover cada servo mediante las barras deslizantes
+    function moverServo(servo, valor) {
+      estadoActual = "Personalizado";
+      document.getElementById("estado").textContent = `Estado actual: ${estadoActual}`;
+      // Actualiza el texto de posición del servo
+      document.getElementById(`posServo${servo}`).textContent = valor;
+
+      // Envía el comando al servidor
+      fetch(`/servo${servo}?pos=${valor}`)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById("estado").textContent = `Servo ${servo}: ${data}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById("estado").textContent = "Error al comunicarse con el servidor.";
+        });
+    }
+
+    // Función para los botones existentes
+    function controlarServo(comando, nuevoEstado) {
+      estadoActual = nuevoEstado;
+      document.getElementById("estado").textContent = `Estado actual: ${estadoActual}`;
+      fetch(`/${comando}`)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById("estado").textContent = `Comando ejecutado: ${comando}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById("estado").textContent = "Error al comunicarse con el servidor.";
+        });
+    }
+  </script>
+</body>
+</html>

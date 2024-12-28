@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      text-align: center;
+      font-family: "Trebuchet MS", Arial;
+    }
+    .button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 16px 40px;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    .button2 {
+      background-color: #555555;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Control de Servos</h1>
+  <p><button class="button" onclick="controlarServo('mano_cerrada')">Cerrar Mano</button></p>
+  <p><button class="button" onclick="controlarServo('mano_abierta')">Abrir Mano</button></p>
+  <p><button class="button" onclick="controlarServo('dedo_1a1')">Mover Dedo 1 a 1</button></p>
+
+  <script>
+    function controlarServo(comando) {
+      fetch(`/${comando}`)
+        .then(response => response.text())
+        .then(data => alert(data))
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
