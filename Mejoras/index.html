@@ -38,29 +38,35 @@
   <!-- Texto de estado -->
   <p id="estado">Estado actual: Mano abierta</p>
 
+  <!-- Campo de entrada y botón para enviar una palabra -->
+  <h2>Escribe una palabra:</h2>
+  <input type="text" id="inputPalabra">
+  <button class="button" onclick="enviarPalabra()">Enviar</button>
+  <p id="mensaje"></p>
+
   <!-- Deslizadores para los 5 servos -->
   <div class="slider-container">
-    <p>Pulgar: <span id="posServo1">22.5</span>°</p>
+    <p>Servo 1: <span id="posServo1">22.5</span>°</p>
     <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo1" oninput="moverServo(1, this.value)">
   </div>
 
   <div class="slider-container">
-    <p>Indice: <span id="posServo2">22.5</span>°</p>
+    <p>Servo 2: <span id="posServo2">22.5</span>°</p>
     <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo2" oninput="moverServo(2, this.value)">
   </div>
 
   <div class="slider-container">
-    <p>Medio: <span id="posServo3">22.5</span>°</p>
+    <p>Servo 3: <span id="posServo3">22.5</span>°</p>
     <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo3" oninput="moverServo(3, this.value)">
   </div>
 
   <div class="slider-container">
-    <p>Anular: <span id="posServo4">22.5</span>°</p>
+    <p>Servo 4: <span id="posServo4">22.5</span>°</p>
     <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo4" oninput="moverServo(4, this.value)">
   </div>
 
   <div class="slider-container">
-    <p>Menique: <span id="posServo5">22.5</span>°</p>
+    <p>Servo 5: <span id="posServo5">22.5</span>°</p>
     <input type="range" min="0" max="45" value="22.5" class="slider" id="sliderServo5" oninput="moverServo(5, this.value)">
   </div>
 
@@ -85,6 +91,9 @@
     function moverServo(servo, valor) {
       estadoActual = "Personalizado";
       document.getElementById("estado").textContent = `Estado actual: ${estadoActual}`;
+      if (servo === 4 || servo === 5) {
+        valor = 45 - valor;
+      }
       // Actualiza el texto de posición del servo
       document.getElementById(`posServo${servo}`).textContent = valor;
 
@@ -112,6 +121,25 @@
         .catch(error => {
           console.error('Error:', error);
           document.getElementById("estado").textContent = "Error al comunicarse con el servidor.";
+        });
+    }
+
+    // Función para enviar una palabra al servidor
+    function enviarPalabra() {
+      var palabra = document.getElementById("inputPalabra").value.toLowerCase(); // Convertir a minúsculas
+      if (palabra.trim() === "") {
+        document.getElementById("mensaje").textContent = "Por favor, introduce una palabra.";
+        return;
+      }
+
+      fetch(`/palabra?texto=${palabra}`)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById("mensaje").textContent = `Enviando: ${palabra}`;
+        })
+        .catch(error => {
+          console.error("Error al enviar palabra:", error);
+          document.getElementById("mensaje").textContent = "Error al enviar la palabra.";
         });
     }
   </script>

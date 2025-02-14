@@ -1,9 +1,5 @@
 #include <ESP32Servo.h>
 
-#include "WiFi.h"
-#include <WebServer.h>
-
-
 Servo miMenique;
 Servo miAnular;
 Servo miMedio;
@@ -16,12 +12,6 @@ Servo miPulgar;
 #define indice 33
 #define pulgar 32
 
-const char* ssid = "Mi_ESP32";
-const char* password = "ManoRobotica12";
-
-WifiServer server(80);
-
-String header;
 
 String output27State = "off";
 String output26State = "off";
@@ -34,13 +24,6 @@ const int output27 = 27;
 const int output25 = 25;
 const int output33 = 33;
 const int output32 = 32;
-
-// Current time
-unsigned long currentTime = millis();
-// Previous time
-unsigned long previousTime = 0; 
-// Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
 
 
 

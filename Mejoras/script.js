@@ -1,24 +1,19 @@
 const express = require('express');
-const axios = require('axios'); // Para realizar solicitudes HTTP al ESP32
+const axios = require('axios');
 const path = require('path');
 const app = express();
 const port = 8000;
 
-// Dirección IP del ESP32 (ajusta esta dirección según la IP de tu ESP32)
-const ESP32_IP = 'http://192.168.1.24';
+const ESP32_IP = 'http://192.168.1.27';
 
-// Variable para almacenar el estado actual
 let estadoActual = 'Mano abierta';
 
-// Servir el HTML desde el servidor Express
 app.use(express.static(path.join(__dirname)));
 
-// Ruta para obtener el estado actual
 app.get('/estado', (req, res) => {
   res.send(estadoActual);
 });
 
-// Rutas para controlar los servos
 app.get('/mano_cerrada', async (req, res) => {
   try {
     await axios.get(`${ESP32_IP}/mano_cerrada`);
@@ -55,7 +50,6 @@ app.get('/dedo_1a1', async (req, res) => {
   }
 });
 
-// Ruta para manejar los deslizadores de los servos
 app.get('/servo:servo', async (req, res) => {
   const { servo } = req.params;
   const { pos } = req.query;
@@ -69,7 +63,19 @@ app.get('/servo:servo', async (req, res) => {
   }
 });
 
-// Servidor escuchando
+// Nueva ruta para manejar la solicitud de la palabra
+app.get('/palabra', async (req, res) => {
+  const { texto } = req.query;
+  try {
+    await axios.get(`${ESP32_IP}/palabra?texto=${texto}`);
+    console.log(`Comando enviado: Deletrear palabra ${texto}`);
+    res.send(`Palabra ${texto} enviada`);
+  } catch (error) {
+    console.error('Error enviando comando:', error);
+    res.status(500).send('Error enviando comando al ESP32');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor Express escuchando en http://localhost:${port}`);
 });
